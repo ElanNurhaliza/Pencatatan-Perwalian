@@ -1,5 +1,4 @@
 -- SEED DATA FOR STMIK BANDUNG ADVISORY SYSTEM
--- Enable pgcrypto for password hashing
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 DO $$
@@ -14,7 +13,7 @@ DECLARE
   v_mhs5_id uuid := '00000000-0000-0000-0000-000000000008';
 BEGIN
 
-  -- 1. INSERT INTO AUTH.USERS (Creates Supabase Auth accounts for real login!)
+  -- 1. INSERT INTO AUTH.USERS
   INSERT INTO auth.users (
     id, instance_id, email, encrypted_password, email_confirmed_at,
     raw_app_meta_data, raw_user_meta_data, created_at, updated_at, role, aud
@@ -31,21 +30,21 @@ BEGIN
     encrypted_password = EXCLUDED.encrypted_password,
     raw_user_meta_data = EXCLUDED.raw_user_meta_data;
 
-  -- 2. INSERT INTO AUTH.IDENTITIES (Required for Supabase Auth Password login)
+  -- 2. INSERT INTO AUTH.IDENTITIES (with provider_id populated)
   INSERT INTO auth.identities (
-    id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at
+    id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at
   ) VALUES
-    (v_admin_id, v_admin_id, format('{"sub":"%s","email":"%s"}', v_admin_id, 'admin@stmikbandung.ac.id')::jsonb, 'email', now(), now(), now()),
-    (v_dosen1_id, v_dosen1_id, format('{"sub":"%s","email":"%s"}', v_dosen1_id, 'ahmad.fauzi@stmikbandung.ac.id')::jsonb, 'email', now(), now(), now()),
-    (v_dosen2_id, v_dosen2_id, format('{"sub":"%s","email":"%s"}', v_dosen2_id, 'nani.wijaya@stmikbandung.ac.id')::jsonb, 'email', now(), now(), now()),
-    (v_mhs1_id, v_mhs1_id, format('{"sub":"%s","email":"%s"}', v_mhs1_id, '10123001@stmikbandung.ac.id')::jsonb, 'email', now(), now(), now()),
-    (v_mhs2_id, v_mhs2_id, format('{"sub":"%s","email":"%s"}', v_mhs2_id, '10123045@stmikbandung.ac.id')::jsonb, 'email', now(), now(), now()),
-    (v_mhs3_id, v_mhs3_id, format('{"sub":"%s","email":"%s"}', v_mhs3_id, '10122102@stmikbandung.ac.id')::jsonb, 'email', now(), now(), now()),
-    (v_mhs4_id, v_mhs4_id, format('{"sub":"%s","email":"%s"}', v_mhs4_id, '10123088@stmikbandung.ac.id')::jsonb, 'email', now(), now(), now()),
-    (v_mhs5_id, v_mhs5_id, format('{"sub":"%s","email":"%s"}', v_mhs5_id, '10123099@stmikbandung.ac.id')::jsonb, 'email', now(), now(), now())
+    (v_admin_id, v_admin_id, format('{"sub":"%s","email":"%s"}', v_admin_id, 'admin@stmikbandung.ac.id')::jsonb, 'email', v_admin_id::text, now(), now(), now()),
+    (v_dosen1_id, v_dosen1_id, format('{"sub":"%s","email":"%s"}', v_dosen1_id, 'ahmad.fauzi@stmikbandung.ac.id')::jsonb, 'email', v_dosen1_id::text, now(), now(), now()),
+    (v_dosen2_id, v_dosen2_id, format('{"sub":"%s","email":"%s"}', v_dosen2_id, 'nani.wijaya@stmikbandung.ac.id')::jsonb, 'email', v_dosen2_id::text, now(), now(), now()),
+    (v_mhs1_id, v_mhs1_id, format('{"sub":"%s","email":"%s"}', v_mhs1_id, '10123001@stmikbandung.ac.id')::jsonb, 'email', v_mhs1_id::text, now(), now(), now()),
+    (v_mhs2_id, v_mhs2_id, format('{"sub":"%s","email":"%s"}', v_mhs2_id, '10123045@stmikbandung.ac.id')::jsonb, 'email', v_mhs2_id::text, now(), now(), now()),
+    (v_mhs3_id, v_mhs3_id, format('{"sub":"%s","email":"%s"}', v_mhs3_id, '10122102@stmikbandung.ac.id')::jsonb, 'email', v_mhs3_id::text, now(), now(), now()),
+    (v_mhs4_id, v_mhs4_id, format('{"sub":"%s","email":"%s"}', v_mhs4_id, '10123088@stmikbandung.ac.id')::jsonb, 'email', v_mhs4_id::text, now(), now(), now()),
+    (v_mhs5_id, v_mhs5_id, format('{"sub":"%s","email":"%s"}', v_mhs5_id, '10123099@stmikbandung.ac.id')::jsonb, 'email', v_mhs5_id::text, now(), now(), now())
   ON CONFLICT (id) DO NOTHING;
 
-  -- 3. PROFILES DATA (Extends auth.users)
+  -- 3. PUBLIC PROFILES
   INSERT INTO public.profiles (id, full_name, role, nim, nidn, email) VALUES
     (v_admin_id, 'Administrator Akademik', 'admin', NULL, NULL, 'admin@stmikbandung.ac.id'),
     (v_dosen1_id, 'Dr. Ahmad Fauzi, M.T.', 'dosen', NULL, '0412038501', 'ahmad.fauzi@stmikbandung.ac.id'),
@@ -62,7 +61,7 @@ BEGIN
     nidn = EXCLUDED.nidn,
     email = EXCLUDED.email;
 
-  -- 4. DOSEN_WALI ASSIGNMENTS
+  -- 4. DOSEN WALI
   INSERT INTO public.dosen_wali (mahasiswa_id, dosen_id, tahun_akademik) VALUES
     (v_mhs1_id, v_dosen1_id, '2025/2026 Ganjil'),
     (v_mhs2_id, v_dosen1_id, '2025/2026 Ganjil'),
