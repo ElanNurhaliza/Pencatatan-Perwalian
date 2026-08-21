@@ -2,10 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { GraduationCap, Lock, Mail, UserCheck, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { GraduationCap, Lock, Mail, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { INITIAL_PROFILES } from '@/lib/mockData';
-import { setDemoUser } from '@/lib/dataService';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,75 +19,58 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const isDemoMode =
-        !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-        process.env.NEXT_PUBLIC_SUPABASE_URL.includes('demo-stmik-bandung');
+      const supabase = createClient();
+      let emailToUse = identifier.trim();
 
-      if (!isDemoMode) {
-        const supabase = createClient();
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: identifier.includes('@') ? identifier : `${identifier}@stmikbandung.ac.id`,
-          password: password,
-        });
-
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        // Fetch profile to redirect
+      // If user inputs NIM or NIDN instead of email, query profiles table first to find email
+      if (!emailToUse.includes('@')) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
+          .select('email, nim, nidn')
+          .or(`nim.eq.${emailToUse},nidn.eq.${emailToUse}`)
+          .maybeSingle();
 
-        if (profile) {
-          setDemoUser(profile);
-          if (profile.role === 'admin') router.push('/admin/dashboard');
-          else if (profile.role === 'mahasiswa') router.push('/mahasiswa/dashboard');
-          else if (profile.role === 'dosen') router.push('/dosen/dashboard');
-          return;
+        if (profile?.email) {
+          emailToUse = profile.email;
+        } else {
+          emailToUse = `${emailToUse}@stmikbandung.ac.id`;
         }
       }
 
-      // Demo Mode / Fallback Authentication Logic
-      const cleanIdent = identifier.trim().toLowerCase();
-      const foundUser = INITIAL_PROFILES.find((p) => {
-        if (p.email?.toLowerCase() === cleanIdent) return true;
-        if (p.nim?.toLowerCase() === cleanIdent) return true;
-        if (p.nidn?.toLowerCase() === cleanIdent) return true;
-        if (cleanIdent === 'admin' && p.role === 'admin') return true;
-        if (cleanIdent === 'dosen' && p.role === 'dosen') return true;
-        if (cleanIdent === 'mahasiswa' && p.role === 'mahasiswa') return true;
-        return false;
+      // Supabase Auth Login
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailToUse,
+        password: password,
       });
 
-      if (foundUser) {
-        setDemoUser(foundUser);
-        if (foundUser.role === 'admin') router.push('/admin/dashboard');
-        else if (foundUser.role === 'mahasiswa') router.push('/mahasiswa/dashboard');
-        else if (foundUser.role === 'dosen') router.push('/dosen/dashboard');
-      } else {
-        // Default to admin for convenient testing if input is empty
-        const defaultUser = INITIAL_PROFILES[0];
-        setDemoUser(defaultUser);
-        router.push('/admin/dashboard');
+      if (error) {
+        throw new Error(error.message);
       }
+
+      if (!data.user) {
+        throw new Error('Sesi user tidak ditemukan.');
+      }
+
+      // Fetch user profile to redirect to role dashboard
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError || !profile) {
+        throw new Error('Profil pengguna tidak ditemukan pada database profiles.');
+      }
+
+      if (profile.role === 'admin') router.push('/admin/dashboard');
+      else if (profile.role === 'mahasiswa') router.push('/mahasiswa/dashboard');
+      else if (profile.role === 'dosen') router.push('/dosen/dashboard');
+      else router.push('/');
     } catch (err: any) {
-      setErrorMsg(err.message || 'Login gagal. Periksa kembali kredensial Anda.');
+      setErrorMsg(err.message || 'Login gagal. Periksa kembali email/NIM/NIDN dan password Anda.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickLogin = (role: 'admin' | 'dosen' | 'mahasiswa') => {
-    let targetUser = INITIAL_PROFILES.find((p) => p.role === role);
-    if (!targetUser) targetUser = INITIAL_PROFILES[0];
-    setDemoUser(targetUser);
-
-    if (role === 'admin') router.push('/admin/dashboard');
-    else if (role === 'mahasiswa') router.push('/mahasiswa/dashboard');
-    else if (role === 'dosen') router.push('/dosen/dashboard');
   };
 
   return (
@@ -109,7 +90,7 @@ export default function LoginPage() {
               Sistem Perwalian Mahasiswa
             </h1>
             <p className="text-brand-100 text-sm leading-relaxed">
-              Platform terpadu untuk pencatatan dan pemantauan perwalian akademik STMIK Bandung. Pantau status bimbingan Anda secara real-time.
+              Platform terpadu untuk pencatatan dan pemantauan perwalian akademik STMIK Bandung. Silakan masuk menggunakan akun terdaftar.
             </p>
           </div>
 
@@ -131,7 +112,7 @@ export default function LoginPage() {
             </div>
 
             <p className="text-xs text-slate-500 mb-6">
-              Silakan masuk menggunakan akun akademik Anda.
+              Masuk menggunakan akun Supabase Auth terdaftar.
             </p>
 
             {errorMsg && (
@@ -166,6 +147,7 @@ export default function LoginPage() {
                   <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    required
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -200,40 +182,13 @@ export default function LoginPage() {
                 disabled={loading}
                 className="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm mt-4 disabled:opacity-50"
               >
-                {loading ? 'Memproses...' : 'Login'}
+                {loading ? 'Memproses...' : 'Login ke Sistem'}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
-
-            {/* Quick Demo Access Pills */}
-            <div className="mt-8 pt-6 border-t border-slate-100">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2.5 text-center">
-                Atau Mode Demo Uji Coba Cepat:
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => handleQuickLogin('admin')}
-                  className="py-1.5 px-2 bg-slate-100 hover:bg-brand-50 hover:text-brand-600 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition-all text-center"
-                >
-                  👑 Admin
-                </button>
-                <button
-                  onClick={() => handleQuickLogin('dosen')}
-                  className="py-1.5 px-2 bg-slate-100 hover:bg-brand-50 hover:text-brand-600 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition-all text-center"
-                >
-                  👨‍🏫 Dosen
-                </button>
-                <button
-                  onClick={() => handleQuickLogin('mahasiswa')}
-                  className="py-1.5 px-2 bg-slate-100 hover:bg-brand-50 hover:text-brand-600 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition-all text-center"
-                >
-                  🎓 Mahasiswa
-                </button>
-              </div>
-            </div>
           </div>
 
-          <div className="mt-6 text-center text-xs text-slate-500">
+          <div className="mt-8 text-center text-xs text-slate-500">
             Butuh bantuan?{' '}
             <button
               onClick={() => alert('Kontak Administrasi: admin@stmikbandung.ac.id')}

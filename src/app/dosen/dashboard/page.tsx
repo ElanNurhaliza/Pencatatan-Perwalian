@@ -6,7 +6,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
 import { StatCard } from '@/components/StatCard';
 import { Users, FileText, History, ArrowRight, Search, GraduationCap } from 'lucide-react';
-import { getProfiles, getDosenWaliList, getPerwalianList, getDemoUser } from '@/lib/dataService';
+import { getProfiles, getDosenWaliList, getPerwalianList, getCurrentUserProfile } from '@/lib/dataService';
 import { Profile, DosenWali, Perwalian } from '@/lib/types';
 
 export default function DosenDashboardPage() {
@@ -19,20 +19,20 @@ export default function DosenDashboardPage() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const user = getDemoUser();
+      const user = await getCurrentUserProfile();
       setCurrentUser(user);
 
       const [dwData, pwData] = await Promise.all([getDosenWaliList(), getPerwalianList()]);
 
       // Filter advisees for this lecturer
       const assigned = dwData.filter(
-        (dw) => dw.dosen_id === user.id || dw.dosen?.nidn === user.nidn
+        (dw) => (user?.id && dw.dosen_id === user.id) || (user?.nidn && dw.dosen?.nidn === user.nidn)
       );
       setMyAdvisees(assigned);
 
       // Filter perwalian entries of advisees of this lecturer
       const ownPerwalian = pwData.filter(
-        (pw) => pw.dosen_id === user.id || pw.dosen?.nidn === user.nidn
+        (pw) => (user?.id && pw.dosen_id === user.id) || (user?.nidn && pw.dosen?.nidn === user.nidn)
       );
       setPerwalianList(ownPerwalian);
       setLoading(false);

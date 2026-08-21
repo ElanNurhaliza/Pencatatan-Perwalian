@@ -12,7 +12,6 @@ import {
   GraduationCap,
   LogOut,
 } from 'lucide-react';
-import { logoutDemoUser } from '@/lib/dataService';
 import { createClient } from '@/lib/supabase/client';
 
 interface SidebarProps {
@@ -29,9 +28,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, userName }) => {
       const supabase = createClient();
       await supabase.auth.signOut();
     } catch (e) {
-      // Ignore if in demo mode
+      console.error('Error signing out:', e);
     }
-    logoutDemoUser();
     router.push('/login');
   };
 

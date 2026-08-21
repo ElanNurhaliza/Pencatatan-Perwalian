@@ -7,7 +7,7 @@ import { StatCard } from '@/components/StatCard';
 import { Badge } from '@/components/Badge';
 import { Modal } from '@/components/Modal';
 import { Users, FileText, CheckCircle2, Download, Filter, Search, Eye, Calendar, UserCheck } from 'lucide-react';
-import { getProfiles, getDosenWaliList, getPerwalianList, getDemoUser } from '@/lib/dataService';
+import { getProfiles, getDosenWaliList, getPerwalianList, getCurrentUserProfile } from '@/lib/dataService';
 import { Profile, DosenWali, Perwalian } from '@/lib/types';
 import * as XLSX from 'xlsx';
 
@@ -27,7 +27,7 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const user = getDemoUser();
+      const user = await getCurrentUserProfile();
       setCurrentUser(user);
 
       const [pData, dwData, pwData] = await Promise.all([

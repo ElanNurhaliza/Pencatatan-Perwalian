@@ -11,8 +11,7 @@ export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-  // If Supabase URL is placeholder, pass through request
-  if (!supabaseUrl || supabaseUrl.includes('demo-stmik-bandung')) {
+  if (!supabaseUrl || !supabaseAnonKey) {
     return response;
   }
 

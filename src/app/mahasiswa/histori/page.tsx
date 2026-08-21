@@ -8,7 +8,7 @@ import { StatCard } from '@/components/StatCard';
 import { Badge } from '@/components/Badge';
 import { Modal } from '@/components/Modal';
 import { History, FileEdit, CheckCircle2, Clock, XCircle, Search, Eye } from 'lucide-react';
-import { getPerwalianList, getDemoUser } from '@/lib/dataService';
+import { getPerwalianList, getCurrentUserProfile } from '@/lib/dataService';
 import { Profile, Perwalian } from '@/lib/types';
 
 export default function MahasiswaHistoriPage() {
@@ -22,12 +22,12 @@ export default function MahasiswaHistoriPage() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const user = getDemoUser();
+      const user = await getCurrentUserProfile();
       setCurrentUser(user);
 
       const pwData = await getPerwalianList();
       const ownPerwalian = pwData.filter(
-        (pw) => pw.mahasiswa_id === user.id || pw.mahasiswa?.nim === user.nim
+        (pw) => (user?.id && pw.mahasiswa_id === user.id) || (user?.nim && pw.mahasiswa?.nim === user.nim)
       );
       setPerwalianList(ownPerwalian);
       setLoading(false);

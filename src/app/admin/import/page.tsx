@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
 import { Upload, FileSpreadsheet, Download, CheckCircle2, AlertCircle } from 'lucide-react';
-import { getDemoUser, addProfilesBatch } from '@/lib/dataService';
+import { getCurrentUserProfile, addProfilesBatch } from '@/lib/dataService';
 import { Profile } from '@/lib/types';
 import Papa from 'papaparse';
 
@@ -18,7 +18,15 @@ interface ParsedCSVRow {
 }
 
 export default function AdminImportPage() {
-  const currentUser = getDemoUser();
+  const [currentUser, setCurrentUser] = useState<Profile | null>(null);
+
+  React.useEffect(() => {
+    async function loadUser() {
+      const user = await getCurrentUserProfile();
+      setCurrentUser(user);
+    }
+    loadUser();
+  }, []);
   const [file, setFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<ParsedCSVRow[]>([]);
   const [importing, setImporting] = useState(false);

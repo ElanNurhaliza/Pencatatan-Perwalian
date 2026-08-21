@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
 import { FileEdit, Calendar, UserCheck, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
-import { getDosenWaliList, addPerwalianRecord, getDemoUser } from '@/lib/dataService';
+import { getDosenWaliList, addPerwalianRecord, getCurrentUserProfile } from '@/lib/dataService';
 import { Profile, DosenWali } from '@/lib/types';
 
 export default function MahasiswaCatatPerwalianPage() {
@@ -25,11 +25,13 @@ export default function MahasiswaCatatPerwalianPage() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const user = getDemoUser();
+      const user = await getCurrentUserProfile();
       setCurrentUser(user);
 
       const dwData = await getDosenWaliList();
-      const assigned = dwData.find((dw) => dw.mahasiswa_id === user.id || dw.mahasiswa?.nim === user.nim);
+      const assigned = dwData.find(
+        (dw) => (user?.id && dw.mahasiswa_id === user.id) || (user?.nim && dw.mahasiswa?.nim === user.nim)
+      );
       setDosenWali(assigned || dwData[0] || null);
       setLoading(false);
     }

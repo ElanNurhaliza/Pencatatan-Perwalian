@@ -8,7 +8,7 @@ import { StatCard } from '@/components/StatCard';
 import { Badge } from '@/components/Badge';
 import { Modal } from '@/components/Modal';
 import { UserCheck, FileEdit, History, Calendar, CheckCircle2, Eye, ArrowRight, GraduationCap } from 'lucide-react';
-import { getDosenWaliList, getPerwalianList, getDemoUser } from '@/lib/dataService';
+import { getDosenWaliList, getPerwalianList, getCurrentUserProfile } from '@/lib/dataService';
 import { Profile, DosenWali, Perwalian } from '@/lib/types';
 
 export default function MahasiswaDashboardPage() {
@@ -21,18 +21,20 @@ export default function MahasiswaDashboardPage() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const user = getDemoUser();
+      const user = await getCurrentUserProfile();
       setCurrentUser(user);
 
       const [dwData, pwData] = await Promise.all([getDosenWaliList(), getPerwalianList()]);
 
       // Find assigned dosen wali for current user
-      const assigned = dwData.find((dw) => dw.mahasiswa_id === user.id || dw.mahasiswa?.nim === user.nim);
+      const assigned = dwData.find(
+        (dw) => (user?.id && dw.mahasiswa_id === user.id) || (user?.nim && dw.mahasiswa?.nim === user.nim)
+      );
       setDosenWali(assigned || dwData[0] || null);
 
       // Filter perwalian belonging to current student
       const ownPerwalian = pwData.filter(
-        (pw) => pw.mahasiswa_id === user.id || pw.mahasiswa?.nim === user.nim
+        (pw) => (user?.id && pw.mahasiswa_id === user.id) || (user?.nim && pw.mahasiswa?.nim === user.nim)
       );
       setPerwalianList(ownPerwalian);
       setLoading(false);

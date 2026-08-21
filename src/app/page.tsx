@@ -2,24 +2,27 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getDemoUser } from '@/lib/dataService';
+import { getCurrentUserProfile } from '@/lib/dataService';
 
 export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    const user = getDemoUser();
-    if (!user) {
-      router.push('/login');
-    } else if (user.role === 'admin') {
-      router.push('/admin/dashboard');
-    } else if (user.role === 'mahasiswa') {
-      router.push('/mahasiswa/dashboard');
-    } else if (user.role === 'dosen') {
-      router.push('/dosen/dashboard');
-    } else {
-      router.push('/login');
+    async function checkAuthAndRedirect() {
+      const profile = await getCurrentUserProfile();
+      if (!profile) {
+        router.push('/login');
+      } else if (profile.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else if (profile.role === 'mahasiswa') {
+        router.push('/mahasiswa/dashboard');
+      } else if (profile.role === 'dosen') {
+        router.push('/dosen/dashboard');
+      } else {
+        router.push('/login');
+      }
     }
+    checkAuthAndRedirect();
   }, [router]);
 
   return (

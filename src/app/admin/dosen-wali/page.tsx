@@ -10,7 +10,7 @@ import {
   getDosenWaliList,
   addDosenWaliAssignment,
   deleteDosenWaliAssignment,
-  getDemoUser,
+  getCurrentUserProfile,
 } from '@/lib/dataService';
 import { Profile, DosenWali } from '@/lib/types';
 
@@ -31,7 +31,8 @@ export default function AdminDosenWaliPage() {
 
   const loadData = async () => {
     setLoading(true);
-    setCurrentUser(getDemoUser());
+    const user = await getCurrentUserProfile();
+    setCurrentUser(user);
     const [pData, dwData] = await Promise.all([getProfiles(), getDosenWaliList()]);
     setProfiles(pData);
     setDosenWaliList(dwData);

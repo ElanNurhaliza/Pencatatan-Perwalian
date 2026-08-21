@@ -7,7 +7,7 @@ import { Header } from '@/components/Header';
 import { Badge } from '@/components/Badge';
 import { Modal } from '@/components/Modal';
 import { ArrowLeft, User, Calendar, History, Eye, GraduationCap } from 'lucide-react';
-import { getProfiles, getPerwalianList, getDemoUser } from '@/lib/dataService';
+import { getProfiles, getPerwalianList, getCurrentUserProfile } from '@/lib/dataService';
 import { Profile, Perwalian } from '@/lib/types';
 
 export default function DosenHistoriMahasiswaPage() {
@@ -24,7 +24,7 @@ export default function DosenHistoriMahasiswaPage() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const user = getDemoUser();
+      const user = await getCurrentUserProfile();
       setCurrentUser(user);
 
       const [profiles, pwData] = await Promise.all([getProfiles(), getPerwalianList()]);
