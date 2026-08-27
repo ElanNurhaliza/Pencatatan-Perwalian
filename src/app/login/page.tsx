@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { GraduationCap, Lock, Mail, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { GraduationCap, Lock, Mail, Eye, EyeOff, ArrowRight, Info } from 'lucide-react';
+import { authenticateUser } from '@/lib/dataService';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,55 +19,14 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const supabase = createClient();
-      let emailToUse = identifier.trim();
+      const userProfile = await authenticateUser(identifier, password);
 
-      // If user inputs NIM or NIDN instead of email, query profiles table first to find email
-      if (!emailToUse.includes('@')) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('email, nim, nidn')
-          .or(`nim.eq.${emailToUse},nidn.eq.${emailToUse}`)
-          .maybeSingle();
-
-        if (profile?.email) {
-          emailToUse = profile.email;
-        } else {
-          emailToUse = `${emailToUse}@stmikbandung.ac.id`;
-        }
-      }
-
-      // Supabase Auth Login
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: emailToUse,
-        password: password,
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      if (!data.user) {
-        throw new Error('Sesi user tidak ditemukan.');
-      }
-
-      // Fetch user profile to redirect to role dashboard
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .single();
-
-      if (profileError || !profile) {
-        throw new Error('Profil pengguna tidak ditemukan pada database profiles.');
-      }
-
-      if (profile.role === 'admin') router.push('/admin/dashboard');
-      else if (profile.role === 'mahasiswa') router.push('/mahasiswa/dashboard');
-      else if (profile.role === 'dosen') router.push('/dosen/dashboard');
+      if (userProfile.role === 'admin') router.push('/admin/dashboard');
+      else if (userProfile.role === 'mahasiswa') router.push('/mahasiswa/dashboard');
+      else if (userProfile.role === 'dosen') router.push('/dosen/dashboard');
       else router.push('/');
     } catch (err: any) {
-      setErrorMsg(err.message || 'Login gagal. Periksa kembali email/NIM/NIDN dan password Anda.');
+      setErrorMsg(err.message || 'Login gagal. Periksa kembali NIM/NIDN/Email dan Password Anda.');
     } finally {
       setLoading(false);
     }
@@ -89,9 +48,26 @@ export default function LoginPage() {
             <h1 className="text-3xl font-extrabold tracking-tight mb-4 leading-tight">
               Sistem Perwalian Mahasiswa
             </h1>
-            <p className="text-brand-100 text-sm leading-relaxed">
+            <p className="text-brand-100 text-sm leading-relaxed mb-6">
               Platform terpadu untuk pencatatan dan pemantauan perwalian akademik STMIK Bandung. Silakan masuk menggunakan akun terdaftar.
             </p>
+
+            {/* Info Format Password Default */}
+            <div className="p-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/15 text-xs space-y-2">
+              <div className="flex items-center gap-2 font-bold text-white mb-1">
+                <Info className="w-4 h-4 text-brand-200" />
+                <span>Format Login Akun:</span>
+              </div>
+              <p className="text-brand-100">
+                • <strong>Mahasiswa</strong>: Username <code className="bg-black/20 px-1 rounded">NIM</code> | Password <code className="bg-black/20 px-1 rounded">NIM@mhsstmikbandung</code>
+              </p>
+              <p className="text-brand-100">
+                • <strong>Dosen</strong>: Username <code className="bg-black/20 px-1 rounded">NIDN</code> | Password <code className="bg-black/20 px-1 rounded">NIDN@dosenstmikbandung</code>
+              </p>
+              <p className="text-brand-100">
+                • <strong>Admin</strong>: Username <code className="bg-black/20 px-1 rounded">admin</code> | Password <code className="bg-black/20 px-1 rounded">admin123</code>
+              </p>
+            </div>
           </div>
 
           <div className="pt-8 border-t border-white/15">
@@ -112,7 +88,7 @@ export default function LoginPage() {
             </div>
 
             <p className="text-xs text-slate-500 mb-6">
-              Masuk menggunakan akun Supabase Auth terdaftar.
+              Masuk menggunakan akun akademik Anda.
             </p>
 
             {errorMsg && (
@@ -131,7 +107,7 @@ export default function LoginPage() {
                   <input
                     type="text"
                     required
-                    placeholder="Masukkan NPM, NIDN atau Email"
+                    placeholder="Contoh: 10123001 atau 0412038501"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-hidden focus:border-brand-500 focus:bg-white transition-all"

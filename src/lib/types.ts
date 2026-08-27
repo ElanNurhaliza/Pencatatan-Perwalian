@@ -7,6 +7,7 @@ export interface Profile {
   nim?: string | null;
   nidn?: string | null;
   email?: string | null;
+  password?: string | null;
   created_at?: string;
 }
 
