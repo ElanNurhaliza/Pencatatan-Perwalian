@@ -78,18 +78,11 @@ export async function getCurrentUserProfile(): Promise<Profile | null> {
       try {
         return JSON.parse(cached) as Profile;
       } catch (e) {
-        // Fallback
+        return null;
       }
     }
   }
-
-  try {
-    const supabase = createClient();
-    const { data: profiles } = await supabase.from('profiles').select('*').limit(1);
-    return profiles && profiles.length > 0 ? profiles[0] : null;
-  } catch (err) {
-    return null;
-  }
+  return null;
 }
 
 // --- PROFILES API ---

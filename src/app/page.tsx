@@ -9,19 +9,25 @@ export default function HomePage() {
 
   useEffect(() => {
     async function checkAuthAndRedirect() {
+      // Synchronous fast check from localStorage / Cookie first
       const profile = await getCurrentUserProfile();
+      
       if (!profile) {
-        router.push('/login');
-      } else if (profile.role === 'admin') {
-        router.push('/admin/dashboard');
+        router.replace('/login');
+        return;
+      }
+
+      if (profile.role === 'admin') {
+        router.replace('/admin/dashboard');
       } else if (profile.role === 'mahasiswa') {
-        router.push('/mahasiswa/dashboard');
+        router.replace('/mahasiswa/dashboard');
       } else if (profile.role === 'dosen') {
-        router.push('/dosen/dashboard');
+        router.replace('/dosen/dashboard');
       } else {
-        router.push('/login');
+        router.replace('/login');
       }
     }
+
     checkAuthAndRedirect();
   }, [router]);
 
