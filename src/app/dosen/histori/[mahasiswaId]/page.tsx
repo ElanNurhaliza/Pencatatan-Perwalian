@@ -111,6 +111,7 @@ export default function DosenHistoriMahasiswaPage() {
                     <th className="py-3 px-4 w-12">No</th>
                     <th className="py-3 px-4">Tanggal Perwalian</th>
                     <th className="py-3 px-4">Semester</th>
+                    <th className="py-3 px-4">Mata Kuliah</th>
                     <th className="py-3 px-4">Keperluan / Topik Bimbingan</th>
                     <th className="py-3 px-4">Status</th>
                     <th className="py-3 px-4 text-center">Aksi Detail</th>
@@ -119,13 +120,13 @@ export default function DosenHistoriMahasiswaPage() {
                 <tbody className="divide-y divide-slate-100">
                   {loading ? (
                     <tr>
-                      <td colSpan={6} className="py-8 text-center text-slate-400">
+                      <td colSpan={7} className="py-8 text-center text-slate-400">
                         Memuat data riwayat perwalian...
                       </td>
                     </tr>
                   ) : perwalianList.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-8 text-center text-slate-400">
+                      <td colSpan={7} className="py-8 text-center text-slate-400">
                         Mahasiswa ini belum memiliki histori pencatatan perwalian.
                       </td>
                     </tr>
@@ -137,7 +138,10 @@ export default function DosenHistoriMahasiswaPage() {
                           {pw.tanggal_perwalian}
                         </td>
                         <td className="py-3.5 px-4 font-semibold text-slate-800">{pw.semester}</td>
-                        <td className="py-3.5 px-4 max-w-sm truncate text-slate-700">{pw.keperluan}</td>
+                        <td className="py-3.5 px-4 font-bold text-brand-700">
+                          {pw.mata_kuliah || 'Umum / Non-Matkul'}
+                        </td>
+                        <td className="py-3.5 px-4 max-w-xs truncate text-slate-700">{pw.keperluan}</td>
                         <td className="py-3.5 px-4">
                           <Badge status={pw.status} />
                         </td>
@@ -177,7 +181,7 @@ export default function DosenHistoriMahasiswaPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <div>
                 <span className="text-slate-400 uppercase text-[10px] font-semibold">Tanggal Sesi</span>
                 <p className="font-medium text-slate-800">{selectedPerwalian.tanggal_perwalian}</p>
@@ -185,6 +189,10 @@ export default function DosenHistoriMahasiswaPage() {
               <div>
                 <span className="text-slate-400 uppercase text-[10px] font-semibold">Semester</span>
                 <p className="font-medium text-slate-800">{selectedPerwalian.semester}</p>
+              </div>
+              <div>
+                <span className="text-slate-400 uppercase text-[10px] font-semibold">Mata Kuliah</span>
+                <p className="font-bold text-brand-700">{selectedPerwalian.mata_kuliah || 'Umum / Non-Matkul'}</p>
               </div>
             </div>
 

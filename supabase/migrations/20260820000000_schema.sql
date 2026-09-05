@@ -53,6 +53,7 @@ create table public.perwalian (
   dosen_id uuid not null references public.profiles(id) on delete cascade,
   tanggal_perwalian date not null default CURRENT_DATE,
   semester text not null,
+  mata_kuliah text,
   keperluan text not null,
   catatan_hasil text,
   status text default 'selesai',

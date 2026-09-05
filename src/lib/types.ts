@@ -27,6 +27,7 @@ export interface Perwalian {
   dosen_id: string;
   tanggal_perwalian: string;
   semester: string;
+  mata_kuliah?: string | null;
   keperluan: string;
   catatan_hasil?: string | null;
   status: 'selesai' | 'diproses' | 'ditolak' | string;

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
-import { FileEdit, Calendar, UserCheck, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { FileEdit, Calendar, UserCheck, CheckCircle2, AlertCircle, ArrowLeft, BookOpen } from 'lucide-react';
 import { getDosenWaliList, addPerwalianRecord, getCurrentUserProfile } from '@/lib/dataService';
 import { Profile, DosenWali } from '@/lib/types';
 
@@ -17,6 +17,7 @@ export default function MahasiswaCatatPerwalianPage() {
   // Form states
   const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
   const [semester, setSemester] = useState('Semester 5');
+  const [mataKuliah, setMataKuliah] = useState('');
   const [keperluan, setKeperluan] = useState('');
   const [catatanHasil, setCatatanHasil] = useState('');
   const [formError, setFormError] = useState('');
@@ -59,6 +60,7 @@ export default function MahasiswaCatatPerwalianPage() {
         dosen_id: dosenWali.dosen_id,
         tanggal_perwalian: tanggal,
         semester: semester,
+        mata_kuliah: mataKuliah.trim() || 'Umum / Non-Matkul',
         keperluan: keperluan,
         catatan_hasil: catatanHasil,
         status: 'selesai',
@@ -189,6 +191,22 @@ export default function MahasiswaCatatPerwalianPage() {
                     <option value="Semester 7">Semester 7</option>
                     <option value="Semester 8">Semester 8</option>
                   </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1.5">
+                  Mata Kuliah (Optional / Terkait Bimbingan)
+                </label>
+                <div className="relative">
+                  <BookOpen className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Contoh: Pemrograman Web II, Kecerdasan Buatan, Tugas Akhir / Skripsi..."
+                    value={mataKuliah}
+                    onChange={(e) => setMataKuliah(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-hidden focus:border-brand-500 font-medium"
+                  />
                 </div>
               </div>
 

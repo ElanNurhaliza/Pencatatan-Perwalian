@@ -232,6 +232,7 @@ export default function AdminDashboardPage() {
                     <th className="py-3 px-4">Dosen Wali</th>
                     <th className="py-3 px-4">Tanggal</th>
                     <th className="py-3 px-4">Semester</th>
+                    <th className="py-3 px-4">Mata Kuliah</th>
                     <th className="py-3 px-4">Keperluan / Topik</th>
                     <th className="py-3 px-4">Status</th>
                     <th className="py-3 px-4 text-center">Aksi</th>
@@ -240,13 +241,13 @@ export default function AdminDashboardPage() {
                 <tbody className="divide-y divide-slate-100">
                   {loading ? (
                     <tr>
-                      <td colSpan={8} className="py-8 text-center text-slate-400">
+                      <td colSpan={9} className="py-8 text-center text-slate-400">
                         Memuat data perwalian...
                       </td>
                     </tr>
                   ) : filteredPerwalian.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="py-8 text-center text-slate-400">
+                      <td colSpan={9} className="py-8 text-center text-slate-400">
                         Tidak ada data perwalian yang cocok dengan filter.
                       </td>
                     </tr>
@@ -269,6 +270,7 @@ export default function AdminDashboardPage() {
                           </div>
                         </td>
                         <td className="py-3.5 px-4 font-medium text-slate-700">{pw.semester}</td>
+                        <td className="py-3.5 px-4 font-bold text-brand-700">{pw.mata_kuliah || 'Umum / Non-Matkul'}</td>
                         <td className="py-3.5 px-4 max-w-xs truncate text-slate-700">{pw.keperluan}</td>
                         <td className="py-3.5 px-4">
                           <Badge status={pw.status} />
@@ -314,7 +316,7 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <div>
                 <span className="text-slate-400 uppercase text-[10px] font-semibold">Tanggal Sesi</span>
                 <p className="font-medium text-slate-800">{selectedPerwalian.tanggal_perwalian}</p>
@@ -322,6 +324,10 @@ export default function AdminDashboardPage() {
               <div>
                 <span className="text-slate-400 uppercase text-[10px] font-semibold">Semester</span>
                 <p className="font-medium text-slate-800">{selectedPerwalian.semester}</p>
+              </div>
+              <div>
+                <span className="text-slate-400 uppercase text-[10px] font-semibold">Mata Kuliah</span>
+                <p className="font-bold text-brand-700">{selectedPerwalian.mata_kuliah || 'Umum / Non-Matkul'}</p>
               </div>
             </div>
 

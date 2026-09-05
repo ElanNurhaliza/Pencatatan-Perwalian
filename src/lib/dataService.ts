@@ -207,6 +207,7 @@ export async function addPerwalianRecord(record: {
   dosen_id: string;
   tanggal_perwalian: string;
   semester: string;
+  mata_kuliah?: string;
   keperluan: string;
   catatan_hasil?: string;
   status?: string;

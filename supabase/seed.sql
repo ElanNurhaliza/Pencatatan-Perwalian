@@ -49,11 +49,11 @@ BEGIN
     dosen_id = EXCLUDED.dosen_id;
 
   -- 3. PERWALIAN LOGS
-  INSERT INTO public.perwalian (mahasiswa_id, dosen_id, tanggal_perwalian, semester, keperluan, catatan_hasil, status) VALUES
-    (v_mhs1_id, v_dosen1_id, '2025-08-15', 'Semester 5', 'Konsultasi Pengambilan SKS & Rencana Judul Skripsi', 'Mahasiswa disetujui mengambil 24 SKS. Disarankan mulai konsultasi topik riset Artificial Intelligence.', 'selesai'),
-    (v_mhs2_id, v_dosen1_id, '2025-08-16', 'Semester 3', 'Bimbingan Akademik & Pengajuan Izin Penelitian', 'Disetujui Surat Pengantar Penelitian ke PT Nusantara. Indeks Prestasi Kumulatif 3.75 memuaskan.', 'selesai'),
-    (v_mhs3_id, v_dosen1_id, '2025-08-18', 'Semester 7', 'Permohonan Pengantar Magang MBKM', 'Dokumen magang diverifikasi. Mahasiswa siap terjun magang industri 6 bulan.', 'selesai'),
-    (v_mhs4_id, v_dosen2_id, '2025-08-19', 'Semester 1', 'Konsultasi Perencanaan Studi Mahasiswa Baru', 'Mahasiswa beradaptasi dengan baik. Jadwal perkuliahan Paket Semester 1 disetujui 20 SKS.', 'selesai'),
-    (v_mhs5_id, v_dosen2_id, '2025-08-20', 'Semester 5', 'Evaluasi Nilai Semester Lalu & Pengajuan Cuti Akademik', 'Mahasiswa berkonsultasi mengenai permohonan dispensasi biaya dan perwalian lanjutan.', 'selesai');
+  INSERT INTO public.perwalian (mahasiswa_id, dosen_id, tanggal_perwalian, semester, mata_kuliah, keperluan, catatan_hasil, status) VALUES
+    (v_mhs1_id, v_dosen1_id, '2025-08-15', 'Semester 5', 'Pemrograman Web II', 'Konsultasi Pengambilan SKS & Rencana Judul Skripsi', 'Mahasiswa disetujui mengambil 24 SKS. Disarankan mulai konsultasi topik riset Artificial Intelligence.', 'selesai'),
+    (v_mhs2_id, v_dosen1_id, '2025-08-16', 'Semester 3', 'Kecerdasan Buatan', 'Bimbingan Akademik & Pengajuan Izin Penelitian', 'Disetujui Surat Pengantar Penelitian ke PT Nusantara. Indeks Prestasi Kumulatif 3.75 memuaskan.', 'selesai'),
+    (v_mhs3_id, v_dosen1_id, '2025-08-18', 'Semester 7', 'Metode Penelitian', 'Permohonan Pengantar Magang MBKM', 'Dokumen magang diverifikasi. Mahasiswa siap terjun magang industri 6 bulan.', 'selesai'),
+    (v_mhs4_id, v_dosen2_id, '2025-08-19', 'Semester 1', 'Algoritma & Pemrograman', 'Konsultasi Perencanaan Studi Mahasiswa Baru', 'Mahasiswa beradaptasi dengan baik. Jadwal perkuliahan Paket Semester 1 disetujui 20 SKS.', 'selesai'),
+    (v_mhs5_id, v_dosen2_id, '2025-08-20', 'Semester 5', 'Sistem Informasi Manajemen', 'Evaluasi Nilai Semester Lalu & Pengajuan Cuti Akademik', 'Mahasiswa berkonsultasi mengenai permohonan dispensasi biaya dan perwalian lanjutan.', 'selesai');
 
 END $$;
